@@ -1,0 +1,56 @@
+# ============================================================
+# fabz- : Automated Stream Clipping Bot — Configuration
+# ============================================================
+
+# Streamers to monitor for top clips
+streamers:
+  twitch:
+    - login: shroud
+    - login: pokimane
+    - login: xqc
+  youtube:
+    # Replace with real channel IDs (found in channel URL or About page)
+    - channel_id: UCxxxxxxxxxxxxxxxxxxxxxx
+
+# Clip selection settings
+clips:
+  # How many top clips to fetch per streamer per run
+  limit_per_streamer: 5
+  # Ignore clips with fewer than this many views
+  min_views: 1000
+  # Ignore clips longer than this (seconds) — Shorts/Reels max is 60s
+  max_duration_seconds: 60
+  # Twitch clip time period: day | week | month | all
+  period: week
+
+# Video processing settings
+processing:
+  # Reformat to vertical 9:16 (1080x1920) for Shorts/Reels/TikTok
+  vertical_format: true
+  # Auto-generate and burn in captions using Whisper
+  add_captions: true
+  # Branding overlay
+  branding:
+    # Text shown in watermark overlay
+    channel_name: "ClipHub"
+    # Position: top-left | top-right | bottom-left | bottom-right
+    watermark_position: top-right
+    # Optional: path to a PNG logo file. Leave empty to use text only.
+    logo_path: ""
+
+# Which platforms to upload processed clips to
+upload_to:
+  youtube_shorts: true
+  tiktok: true
+  instagram_reels: true
+
+# Scheduling
+schedule:
+  # Run the pipeline every N hours
+  interval_hours: 6
+
+# Paths (relative to project root)
+paths:
+  downloads: downloads
+  output: output
+  database: fabz.db
