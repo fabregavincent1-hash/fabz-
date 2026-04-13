@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>fabz- Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f0f13;
+      color: #e2e2e2;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
+    h1 span { color: #7c3aed; }
+    .subtitle { color: #888; font-size: 0.9rem; margin-top: 4px; }
+
+    .header { margin-bottom: 28px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #1a1a22;
+      border: 1px solid #2a2a36;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .btn:last-child { margin-bottom: 0; }
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-primary   { background: #7c3aed; color: #fff; }
+    .btn-green     { background: #16a34a; color: #fff; }
+    .btn-blue      { background: #2563eb; color: #fff; }
+    .btn-orange    { background: #d97706; color: #fff; }
+    .btn-red       { background: #dc2626; color: #fff; }
+    .btn-ghost     { background: #2a2a36; color: #ccc; }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #555;
+      flex-shrink: 0;
+    }
+    .dot.green  { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+    .dot.red    { background: #ef4444; }
+    .dot.yellow { background: #eab308; }
+
+    .status-label { font-size: 0.88rem; color: #aaa; }
+    .status-label strong { color: #fff; }
+
+    /* Streamer list */
+    .streamer-list { list-style: none; margin-bottom: 12px; }
+    .streamer-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: #0f0f13;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .streamer-list li span.platform {
+      font-size: 0.72rem;
+      background: #2a2a36;
+      color: #aaa;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .streamer-list li button {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+    }
+    .streamer-list li button:hover { color: #ef4444; }
+
+    .add-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .add-row input, .add-row select {
+      flex: 1;
+      padding: 8px 10px;
+      background: #0f0f13;
+      border: 1px solid #2a2a36;
+      border-radius: 6px;
+      color: #e2e2e2;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .add-row input:focus, .add-row select:focus { border-color: #7c3aed; }
+
+    /* API key form */
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      color: #888;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .field input {
+      width: 100%;
+      padding: 9px 12px;
+      background: #0f0f13;
+      border: 1px solid #2a2a36;
+      border-radius: 6px;
+      color: #e2e2e2;
+      font-size: 0.85rem;
+      font-family: monospace;
+      outline: none;
+    }
+    .field input:focus { border-color: #7c3aed; }
+
+    /* Log terminal */
+    #log-box {
+      background: #080810;
+      border: 1px solid #2a2a36;
+      border-radius: 10px;
+      padding: 16px;
+      height: 260px;
+      overflow-y: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+    #log-box .line { white-space: pre-wrap; word-break: break-all; }
+    #log-box .line.info    { color: #a3e635; }
+    #log-box .line.error   { color: #f87171; }
+    #log-box .line.warn    { color: #fbbf24; }
+    #log-box .line.debug   { color: #64748b; }
+    #log-box .line.system  { color: #818cf8; }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .log-header h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+    }
+    #clear-log {
+      background: none;
+      border: 1px solid #2a2a36;
+      color: #666;
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #clear-log:hover { color: #ccc; border-color: #444; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge-green  { background: #16a34a22; color: #22c55e; border: 1px solid #16a34a44; }
+    .badge-red    { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+    .badge-yellow { background: #d9770622; color: #fbbf24; border: 1px solid #d9770644; }
+    .badge-grey   { background: #2a2a36; color: #888; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>fabz-</span> Stream Clipping Bot</h1>
+  <p class="subtitle">Automated clip pipeline — Twitch &amp; YouTube → Shorts / TikTok / Reels</p>
+</div>
+
+<div class="grid">
+
+  <!-- ── Setup ──────────────────────────── -->
+  <div class="card">
+    <h2>Setup</h2>
+    <button class="btn btn-primary" onclick="runAction('install')">
+      <span id="install-icon">&#x2B07;</span> Install Dependencies
+    </button>
+    <button class="btn btn-ghost" onclick="runAction('check')">
+      &#x2713; Check System Requirements
+    </button>
+  </div>
+
+  <!-- ── Run ──────────────────────────────── -->
+  <div class="card">
+    <h2>Pipeline</h2>
+    <button class="btn btn-green" onclick="runAction('run')">
+      &#x25B6; Run Pipeline Now
+    </button>
+    <button class="btn btn-blue" onclick="runAction('dryrun')">
+      &#x1F9EA; Dry Run (no uploads)
+    </button>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-orange" style="flex:1" onclick="runAction('start_scheduler')" id="btn-start-sched">
+        &#x23F0; Start Scheduler
+      </button>
+      <button class="btn btn-red" style="flex:1" onclick="runAction('stop_scheduler')" id="btn-stop-sched" disabled>
+        &#x23F9; Stop
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Scheduler status ──────────────── -->
+  <div class="card">
+    <h2>Status</h2>
+    <div class="status-row">
+      <div class="dot" id="dot-scheduler"></div>
+      <span class="status-label">Scheduler: <strong id="label-scheduler">Stopped</strong></span>
+      <span class="badge badge-grey" id="badge-scheduler">idle</span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-twitch"></div>
+      <span class="status-label">Twitch API: <strong id="label-twitch">Not tested</strong></span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-youtube"></div>
+      <span class="status-label">YouTube API: <strong id="label-youtube">Not tested</strong></span>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="pollStatus()">&#x21BB; Refresh</button>
+  </div>
+
+  <!-- ── Streamers ──────────────────────── -->
+  <div class="card">
+    <h2>Streamers to Monitor</h2>
+    <ul class="streamer-list" id="streamer-list"></ul>
+    <div class="add-row">
+      <select id="new-platform">
+        <option value="twitch">Twitch</option>
+        <option value="youtube">YouTube</option>
+      </select>
+      <input id="new-streamer" placeholder="username or channel ID" />
+    </div>
+    <button class="btn btn-ghost" onclick="addStreamer()">+ Add Streamer</button>
+    <button class="btn btn-primary" style="margin-top:6px" onclick="saveStreamers()">Save Streamers</button>
+  </div>
+
+</div>
+
+<!-- ── API Keys ──────────────────────────────────────────────── -->
+<div class="card" style="margin-bottom:16px">
+  <h2>API Keys &amp; Credentials</h2>
+  <div class="grid" style="margin-bottom:0;gap:12px">
+    <div>
+      <div class="field"><label>Twitch Client ID</label>
+        <input type="password" id="env-TWITCH_CLIENT_ID" placeholder="••••••••" /></div>
+      <div class="field"><label>Twitch Client Secret</label>
+        <input type="password" id="env-TWITCH_CLIENT_SECRET" placeholder="••••••••" /></div>
+      <div class="field"><label>YouTube API Key</label>
+        <input type="password" id="env-YOUTUBE_API_KEY" placeholder="••••••••" /></div>
+    </div>
+    <div>
+      <div class="field"><label>TikTok Access Token</label>
+        <input type="password" id="env-TIKTOK_ACCESS_TOKEN" placeholder="••••••••" /></div>
+      <div class="field"><label>Instagram Access Token</label>
+        <input type="password" id="env-INSTAGRAM_ACCESS_TOKEN" placeholder="••••••••" /></div>
+      <div class="field"><label>Instagram Account ID</label>
+        <input type="text" id="env-INSTAGRAM_ACCOUNT_ID" placeholder="17841400..." /></div>
+    </div>
+  </div>
+  <button class="btn btn-primary" style="max-width:200px;margin-top:4px" onclick="saveEnv()">
+    &#x1F4BE; Save API Keys
+  </button>
+</div>
+
+<!-- ── Log Terminal ──────────────────────────────────────────── -->
+<div class="card">
+  <div class="log-header">
+    <h2>Live Log</h2>
+    <button id="clear-log" onclick="clearLog()">Clear</button>
+  </div>
+  <div id="log-box"></div>
+</div>
+
+<script>
+  const logBox = document.getElementById('log-box');
+  let schedulerRunning = false;
+  let streamers = [];
+
+  function log(msg, type = 'info') {
+    const line = document.createElement('div');
+    line.className = `line ${type}`;
+    const ts = new Date().toLocaleTimeString();
+    line.textContent = `[${ts}] ${msg}`;
+    logBox.appendChild(line);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function clearLog() {
+    logBox.innerHTML = '';
+  }
+
+  // ── Stream log lines from server ──────────────────────────────
+  function streamAction(url, onDone) {
+    const es = new EventSource(url);
+    es.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === 'done') {
+        es.close();
+        if (onDone) onDone(data.success);
+        return;
+      }
+      const text = data.text || '';
+      let type = 'info';
+      if (/ERROR|error/i.test(text)) type = 'error';
+      else if (/WARNING|WARN/i.test(text)) type = 'warn';
+      else if (/DEBUG/i.test(text)) type = 'debug';
+      log(text, type);
+    };
+    es.onerror = () => {
+      log('Connection lost.', 'error');
+      es.close();
+      if (onDone) onDone(false);
+    };
+  }
+
+  // ── Actions ───────────────────────────────────────────────────
+  function runAction(action) {
+    log(`Running: ${action}`, 'system');
+
+    if (action === 'start_scheduler') {
+      fetch('/api/scheduler/start', { method: 'POST' })
+        .then(r => r.json()).then(d => {
+          if (d.ok) { setSchedulerState(true); log('Scheduler started.', 'info'); }
+          else log('Failed to start scheduler: ' + d.error, 'error');
+        });
+      return;
+    }
+    if (action === 'stop_scheduler') {
+      fetch('/api/scheduler/stop', { method: 'POST' })
+        .then(r => r.json()).then(d => {
+          setSchedulerState(false);
+          log('Scheduler stopped.', 'warn');
+        });
+      return;
+    }
+
+    streamAction(`/api/run/${action}`, (success) => {
+      if (action === 'check') pollStatus();
+      log(success ? `Done: ${action}` : `Failed: ${action}`, success ? 'info' : 'error');
+    });
+  }
+
+  function setSchedulerState(running) {
+    schedulerRunning = running;
+    document.getElementById('btn-start-sched').disabled = running;
+    document.getElementById('btn-stop-sched').disabled = !running;
+    document.getElementById('dot-scheduler').className = 'dot ' + (running ? 'green' : 'red');
+    document.getElementById('label-scheduler').textContent = running ? 'Running' : 'Stopped';
+    const badge = document.getElementById('badge-scheduler');
+    badge.textContent = running ? 'active' : 'idle';
+    badge.className = 'badge ' + (running ? 'badge-green' : 'badge-grey');
+  }
+
+  // ── Status poll ───────────────────────────────────────────────
+  function pollStatus() {
+    fetch('/api/status').then(r => r.json()).then(d => {
+      setSchedulerState(d.scheduler_running);
+      setApiStatus('twitch', d.twitch_ok);
+      setApiStatus('youtube', d.youtube_ok);
+    });
+  }
+
+  function setApiStatus(name, ok) {
+    const dot = document.getElementById(`dot-${name}`);
+    const label = document.getElementById(`label-${name}`);
+    if (ok === null) { dot.className = 'dot yellow'; label.textContent = 'Not tested'; return; }
+    dot.className = 'dot ' + (ok ? 'green' : 'red');
+    label.textContent = ok ? 'OK' : 'Error';
+  }
+
+  // ── Streamers ─────────────────────────────────────────────────
+  function renderStreamers() {
+    const ul = document.getElementById('streamer-list');
+    ul.innerHTML = '';
+    streamers.forEach((s, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>${s.login || s.channel_id}</span>
+        <span class="platform">${s.platform}</span>
+        <button onclick="removeStreamer(${i})">&#x2715;</button>`;
+      ul.appendChild(li);
+    });
+  }
+
+  function addStreamer() {
+    const platform = document.getElementById('new-platform').value;
+    const val = document.getElementById('new-streamer').value.trim();
+    if (!val) return;
+    if (platform === 'twitch') streamers.push({ platform: 'twitch', login: val });
+    else streamers.push({ platform: 'youtube', channel_id: val });
+    document.getElementById('new-streamer').value = '';
+    renderStreamers();
+  }
+
+  function removeStreamer(i) {
+    streamers.splice(i, 1);
+    renderStreamers();
+  }
+
+  function saveStreamers() {
+    fetch('/api/streamers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ streamers }),
+    }).then(r => r.json()).then(d => {
+      log(d.ok ? 'Streamers saved to config.yaml' : 'Failed to save: ' + d.error,
+          d.ok ? 'info' : 'error');
+    });
+  }
+
+  // ── Load current streamers from server ───────────────────────
+  function loadStreamers() {
+    fetch('/api/streamers').then(r => r.json()).then(d => {
+      streamers = d.streamers || [];
+      renderStreamers();
+    });
+  }
+
+  // ── API Keys ──────────────────────────────────────────────────
+  function saveEnv() {
+    const keys = [
+      'TWITCH_CLIENT_ID','TWITCH_CLIENT_SECRET','YOUTUBE_API_KEY',
+      'TIKTOK_ACCESS_TOKEN','INSTAGRAM_ACCESS_TOKEN','INSTAGRAM_ACCOUNT_ID',
+    ];
+    const env = {};
+    keys.forEach(k => {
+      const v = document.getElementById(`env-${k}`).value.trim();
+      if (v) env[k] = v;
+    });
+    fetch('/api/env', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(env),
+    }).then(r => r.json()).then(d => {
+      log(d.ok ? 'API keys saved to .env' : 'Failed: ' + d.error, d.ok ? 'info' : 'error');
+    });
+  }
+
+  // ── Load existing key hints ────────────────────────────────────
+  function loadEnvHints() {
+    fetch('/api/env').then(r => r.json()).then(d => {
+      (d.keys || []).forEach(k => {
+        const el = document.getElementById(`env-${k}`);
+        if (el) el.placeholder = '(already set)';
+      });
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  pollStatus();
+  loadStreamers();
+  loadEnvHints();
+  log('fabz- dashboard ready. Click a button to get started.', 'system');
+</script>
+</body>
+</html>
